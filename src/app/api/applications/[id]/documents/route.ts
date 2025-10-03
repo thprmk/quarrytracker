@@ -3,9 +3,15 @@ import connectMongoDB from '@/lib/mongodb';
 import Application from '@/lib/models/Application';
 import { Types } from 'mongoose';
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+// The function signature is changed here to accept a `context` object.
+export async function PUT(
+    request: Request,
+    context: { params: { id: string } }
+) {
     try {
-        const { id } = params;
+        const { params } = context; // Destructure params from the context object
+        const { id } = params;      // Then get the id from params
+        
         const { stepNumber, fileName } = await request.json();
 
         // Validate input
@@ -18,12 +24,9 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
         await connectMongoDB();
 
-        // Find the application and push the new document into the correct step's documents array
         const result = await Application.updateOne(
             { _id: id, "processSteps.stepNumber": stepNumber },
             { 
-                // $push adds an item to an array.
-                // The `$` is a positional operator that targets the array element matched in the query.
                 $push: { 
                     "processSteps.$.documents": { fileName } 
                 } 
