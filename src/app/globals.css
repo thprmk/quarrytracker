@@ -1,25 +1,18 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
 
 @layer base {
-  @keyframes fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
+  /* --- Keyframes & Global Rules --- */
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slide-in-from-bottom { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  * { border-color: hsl(var(--border)); }
 
-  @keyframes slide-in-from-bottom {
-    from { transform: translateY(10px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-
+  /* --- LIGHT MODE COLORS (Default) --- */
   :root {
-    /* A softer, more professional color palette */
     --background: 240 10% 99%;
     --foreground: 224 71% 4%;
     --card: 240 0% 100%;
     --card-foreground: 224 71% 4%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71% 4%;
     --primary: 221 83% 53%;
     --primary-foreground: 210 40% 98%;
     --muted: 220 10% 91%;
@@ -36,10 +29,4 @@
     background-color: hsl(var(--background));
     font-family: 'Inter', sans-serif;
   }
-  
-  
-  * {
-    border-color: hsl(var(--border));
-  }
-
 }

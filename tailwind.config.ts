@@ -40,8 +40,6 @@ const config: Config = {
         md: `calc(0.5rem - 2px)`,
         sm: `calc(0.5rem - 4px)`,
       },
-
-
       keyframes: {
         "fade-in": {
           from: { opacity: '0' },
@@ -57,7 +55,7 @@ const config: Config = {
         "slide-in": 'slide-in-from-bottom 0.5s ease-out forwards',
       },
     },
-    },
+  },
   plugins: [],
 }
 export default config

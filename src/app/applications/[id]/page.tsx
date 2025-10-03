@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, use, useCallback } from 'react'; // Import 'use' and 'useCallback'
+import { useState, useEffect, use, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Check, Loader2, UploadCloud, Paperclip, Clock, ChevronDown, Circle } from 'lucide-react';
+// FIX #1: Removed the unused 'Circle' icon from the import.
+import { ArrowLeft, Check, Loader2, UploadCloud, Paperclip, Clock, ChevronDown } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 // --- Type Definitions for clarity and safety ---
@@ -11,7 +12,7 @@ interface Document { _id: string; fileName: string; }
 interface ProcessStep { _id: string; stepNumber: number; stepTitle: string; status: ProcessStatus; documents: Document[]; }
 interface ApplicationData { _id: string; applicationName: string; processSteps: ProcessStep[]; }
 
-// Define the type for the component's props
+// FIX #2: Define the type for the component's props. This is the main fix.
 interface ApplicationTrackerPageProps {
   params: { id: string };
 }
@@ -22,15 +23,15 @@ const StatusIcon = ({ status }: { status: ProcessStep['status'] }) => {
   return <div className="h-2 w-2 rounded-full bg-muted-foreground"></div>;
 };
 
+// FIX #3: Apply the new props type to the component's function signature.
 export default function ApplicationTrackerPage({ params }: ApplicationTrackerPageProps) {
-    // FIX #1: Correctly type `params` before using the `use` hook.
+    // Now that 'params' is correctly typed, the 'use' hook will work without errors.
     const { id } = use(params);
 
     const [application, setApplication] = useState<ApplicationData | null>(null);
     const [loading, setLoading] = useState(true);
     const [openStep, setOpenStep] = useState<number | null>(null);
 
-    // FIX #2: Wrap fetchApplication in useCallback to create a stable function reference.
     const fetchApplication = useCallback(async (isInitialLoad = false) => {
         try {
             const res = await fetch(`/api/applications/${id}`);
@@ -50,9 +51,8 @@ export default function ApplicationTrackerPage({ params }: ApplicationTrackerPag
         } finally {
             setLoading(false);
         }
-    }, [id]); // The function depends on 'id'.
+    }, [id]);
 
-    // FIX #3: Add the stable `fetchApplication` function to the dependency array.
     useEffect(() => {
         fetchApplication(true);
     }, [fetchApplication]);
@@ -64,7 +64,6 @@ export default function ApplicationTrackerPage({ params }: ApplicationTrackerPag
 
         const originalApplication = JSON.parse(JSON.stringify(application));
         const updatedSteps = application.processSteps.map(s =>
-            // FIX #4: Use the specific 'ProcessStatus' type instead of 'any'.
             s.stepNumber === stepNumber ? { ...s, status: newStatus as ProcessStatus } : s
         );
         setApplication({ ...application, processSteps: updatedSteps });
@@ -78,7 +77,6 @@ export default function ApplicationTrackerPage({ params }: ApplicationTrackerPag
             if (!res.ok) throw new Error("Failed to update status");
             toast.success(<span><b>{step.stepTitle}</b> updated to <b>{newStatus}</b>.</span>);
         } catch (error) {
-            // FIX #5: Use the 'error' variable so it's not considered unused.
             console.error("Failed to update status:", error);
             toast.error(`Failed to update ${step.stepTitle}.`);
             setApplication(originalApplication);
