@@ -3,14 +3,14 @@ import connectMongoDB from '@/lib/mongodb';
 import Application from '@/lib/models/Application';
 import { Types } from 'mongoose';
 
-// The function signature MUST accept a 'context' object as the second argument.
+// The function signature MUST accept a `context` object as the second argument.
 export async function PUT(
     request: Request,
     context: { params: { id: string } }
 ) {
     try {
-        const { params } = context; // Get params FROM the context object
-        const { id } = params;      // Then get the id FROM params
+        const { params } = context; // Get params from the context
+        const { id } = params;      // Then get the id from params
         
         const { stepNumber, fileName } = await request.json();
 

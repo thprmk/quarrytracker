@@ -1,17 +1,22 @@
 import { NextResponse } from 'next/server';
 import connectMongoDB from '@/lib/mongodb';
 import Application from '@/lib/models/Application';
+import { Types } from 'mongoose';
 
-// The function signature is changed here.
-// We get `request` as the first argument, and `{ params }` as the second.
-// We don't need to destructure `params` from the second argument anymore.
+// The function signature must accept a `context` object as the second argument.
 export async function GET(
-    request: Request, 
-    { params }: { params: { id: string } }
+    request: Request,
+    context: { params: { id: string } }
 ) {
     try {
+        const { params } = context; // Get params from the context
+        const { id } = params;      // Then get the id from params
+        
+        if (!Types.ObjectId.isValid(id)) {
+            return NextResponse.json({ error: "Invalid Application ID" }, { status: 400 });
+        }
+
         await connectMongoDB();
-        const { id } = params; // This is now safe
         const application = await Application.findById(id);
 
         if (!application) {
@@ -25,13 +30,19 @@ export async function GET(
     }
 }
 
-// We apply the same fix to the PUT function's signature
+// The PUT function must also accept the `context` object.
 export async function PUT(
-    request: Request, 
-    { params }: { params: { id: string } }
+    request: Request,
+    context: { params: { id: string } }
 ) {
     try {
-        const { id } = params; // This is now safe
+        const { params } = context;
+        const { id } = params;
+        
+        if (!Types.ObjectId.isValid(id)) {
+            return NextResponse.json({ error: "Invalid Application ID" }, { status: 400 });
+        }
+        
         const { stepNumber, newStatus } = await request.json();
 
         await connectMongoDB();
