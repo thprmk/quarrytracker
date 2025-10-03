@@ -3,14 +3,14 @@ import connectMongoDB from '@/lib/mongodb';
 import Application from '@/lib/models/Application';
 import { Types } from 'mongoose';
 
-// The function signature MUST accept a `context` object as the second argument.
+// PUT handler - params must be awaited in Next.js 15
 export async function PUT(
     request: Request,
-    context: { params: { id: string } }
+    context: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { params } = context; // Get params from the context
-        const { id } = params;      // Then get the id from params
+        const params = await context.params; // Await params from context
+        const { id } = params;               // Then get the id from params
         
         const { stepNumber, fileName } = await request.json();
 

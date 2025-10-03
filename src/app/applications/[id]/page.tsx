@@ -1,21 +1,16 @@
 'use client';
 
-import { useState, useEffect, use, useCallback } from 'react';
+import { useState, useEffect, use, useCallback } from 'react'; // FIX #1: Import the 'use' hook
 import Link from 'next/link';
-// FIX #1: Removed the unused 'Circle' icon from the import.
 import { ArrowLeft, Check, Loader2, UploadCloud, Paperclip, Clock, ChevronDown } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-// --- Type Definitions for clarity and safety ---
+// --- Type Definitions ---
 type ProcessStatus = 'Not Started' | 'In Progress' | 'Completed';
 interface Document { _id: string; fileName: string; }
 interface ProcessStep { _id: string; stepNumber: number; stepTitle: string; status: ProcessStatus; documents: Document[]; }
 interface ApplicationData { _id: string; applicationName: string; processSteps: ProcessStep[]; }
-
-// FIX #2: Define the type for the component's props. This is the main fix.
-interface ApplicationTrackerPageProps {
-  params: { id: string };
-}
+interface ApplicationTrackerPageProps {  params: Promise<{ id: string }>;  }
 
 const StatusIcon = ({ status }: { status: ProcessStep['status'] }) => {
   if (status === 'Completed') return <Check className="h-4 w-4 text-white" />;
@@ -23,9 +18,8 @@ const StatusIcon = ({ status }: { status: ProcessStep['status'] }) => {
   return <div className="h-2 w-2 rounded-full bg-muted-foreground"></div>;
 };
 
-// FIX #3: Apply the new props type to the component's function signature.
 export default function ApplicationTrackerPage({ params }: ApplicationTrackerPageProps) {
-    // Now that 'params' is correctly typed, the 'use' hook will work without errors.
+    // FIX #2: Unwrap the promise-like params object using React.use()
     const { id } = use(params);
 
     const [application, setApplication] = useState<ApplicationData | null>(null);
@@ -34,6 +28,7 @@ export default function ApplicationTrackerPage({ params }: ApplicationTrackerPag
 
     const fetchApplication = useCallback(async (isInitialLoad = false) => {
         try {
+            // Now we use the unwrapped 'id' variable
             const res = await fetch(`/api/applications/${id}`);
             if (!res.ok) throw new Error("Failed to fetch application data");
             const data: ApplicationData = await res.json();
@@ -57,6 +52,7 @@ export default function ApplicationTrackerPage({ params }: ApplicationTrackerPag
         fetchApplication(true);
     }, [fetchApplication]);
 
+    // ... The rest of your functions (handleStatusChange, handleFileUpload, etc.) remain unchanged ...
     const handleStatusChange = async (stepNumber: number, newStatus: string) => {
         if (!application) return;
         const step = application.processSteps.find(s => s.stepNumber === stepNumber);
@@ -109,16 +105,14 @@ export default function ApplicationTrackerPage({ params }: ApplicationTrackerPag
         setOpenStep(openStep === stepNumber ? null : stepNumber);
     };
 
-    // --- The JSX part of the component has no changes ---
+    // ... The rest of your JSX remains unchanged ...
     if (loading) return (
       <div className="flex justify-center items-center h-64"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
     );
     if (!application) return (
       <div className="text-center py-12"><p className="font-semibold text-foreground">Project Not Found</p><Link href="/" className="text-primary hover:underline mt-2 inline-block">Return to Dashboard</Link></div>
     );
-
     const activeStepInfo = application.processSteps.find(s => s.stepNumber === openStep);
-
     return (
         <div className="animate-slide-in">
             <div className="mb-8">

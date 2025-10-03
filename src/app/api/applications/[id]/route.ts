@@ -3,14 +3,13 @@ import connectMongoDB from '@/lib/mongodb';
 import Application from '@/lib/models/Application';
 import { Types } from 'mongoose';
 
-// The function signature must accept a `context` object as the second argument.
+// GET handler - params must be awaited in Next.js 15
 export async function GET(
     request: Request,
-    context: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { params } = context; // Get params from the context
-        const { id } = params;      // Then get the id from params
+        const { id } = await params; // Await params before accessing properties
         
         if (!Types.ObjectId.isValid(id)) {
             return NextResponse.json({ error: "Invalid Application ID" }, { status: 400 });
@@ -30,14 +29,13 @@ export async function GET(
     }
 }
 
-// The PUT function must also accept the `context` object.
+// PUT handler - params must be awaited in Next.js 15
 export async function PUT(
     request: Request,
-    context: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { params } = context;
-        const { id } = params;
+        const { id } = await params; // Await params before accessing properties
         
         if (!Types.ObjectId.isValid(id)) {
             return NextResponse.json({ error: "Invalid Application ID" }, { status: 400 });

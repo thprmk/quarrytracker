@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="en">
-      <body className="antialiased">
+      <body className={`${inter.className} antialiased`}>
         <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
         
         <div className="grid min-h-screen w-full md:grid-cols-[240px_1fr]">
